@@ -280,19 +280,23 @@ def seed_license_requirements(conn):
 
 
 def seed_asp_programs(conn):
+    # (service_name, asp_name, program_name, commission_type, commission_amount,
+    #  approval_conditions, cookie_duration_days, partnership_status, notes)
     rows = [
         ("エアコンクリーニング", "A8.net", "生活サービス系(一括見積・比較サイト経由と推定)", "成果報酬", "未確認",
-         "未確認", None, "not_available", "アカウント未開設のため未確認", None),
+         "未確認", None, "not_applied", "案件名・報酬額とも未検証。read-onlyスキャン結果待ち"),
         ("戸建てリフォーム", "もしもアフィリエイト", "リフォーム一括見積もり系(推定)", "成果報酬", "未確認",
-         "未確認", None, "not_available", "アカウント未開設のため未確認", None),
+         "未確認", None, "not_applied", "同上"),
         ("庭木剪定", "A8.net", "生活サービスマッチング系(推定)", "成果報酬", "未確認",
-         "未確認", None, "not_available", "アカウント未開設のため未確認", None),
+         "未確認", None, "not_applied", "同上"),
     ]
     conn.executemany(
         """INSERT INTO asp_programs (service_id, asp_name, program_name, commission_type,
-           commission_amount, approval_conditions, cookie_duration_days, data_type, notes, source_url)
-           VALUES ((SELECT service_id FROM service_catalog WHERE service_name=?), ?,?,?,?,?,?,?,?,?)""",
-        rows,
+           commission_amount, approval_conditions, cookie_duration_days, partnership_status,
+           status, data_type, notes, last_checked_at, collected_at)
+           VALUES ((SELECT service_id FROM service_catalog WHERE service_name=?), ?,?,?,?,?,?,?,
+                   'unknown','not_available',?,?,?)""",
+        [r + (TODAY, TODAY) for r in rows],
     )
 
 

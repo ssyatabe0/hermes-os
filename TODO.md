@@ -21,12 +21,20 @@
 - [ ] 選定した最初の5市場について、記事構成案（見出し構成・想定検索意図・CTA設計）を作成
       ※ まだ記事本文は書かない。構成レビュー後に着手
 - [ ] はてなブログの無料アカウント開設方針の確定（誰の名義で開設するか等、ユーザー確認が必要な場合あり）
-- [ ] **ライブドアブログ（ID: ssyatabe2）のAtomPub用APIキーをユーザーから取得し、
-      自動投稿スクリプト（Python/`requests`でAtomPub投稿）を実装**（D-008）
-- [ ] **A8.net / バリューコマースでの提携申請はユーザー側の作業。
-      `research/03_affiliate_asp_landscape.md`の検索キーワード候補を使って
-      対象サービスの案件を探し、提携申請 → 承認後の広告リンク/バナーコードを
-      Claude側へ共有してもらい、`asp_programs`テーブルへ実測反映する**
+- [x] AtomPub投稿クライアントの実装（`automation/livedoor/atompub_client.py`、
+      requestsベース、APIキーは環境変数から読む）
+- [x] Playwrightブラウザ自動化基盤の構築・実機動作確認（`automation/`、D-010/D-011）
+- [ ] **【ユーザー側の作業、ローカルMacで実行】**
+      `automation/README.md`の手順に従い、ローカルでPlaywright環境をセットアップし
+      `python -m automation.livedoor.login_helper` を実行してライブドアブログの
+      AtomPub用APIキーを取得 → `automation/.env`の`LIVEDOOR_ATOMPUB_KEY`へ保存
+- [ ] **【ユーザー側の作業】** A8.net・バリューコマースの利用規約を確認し、自動アクセスが
+      許可される場合は`automation/asp/base.py`の`TOS_REGISTRY`を更新。その後
+      `a8net.py`/`valuecommerce.py`内の検索画面セレクタを実際のページに合わせて実装
+- [ ] **【ユーザー側の作業、上記が難しい場合の代替】** A8.net / バリューコマースでの
+      提携申請を手動で行う。`research/03_affiliate_asp_landscape.md`の検索キーワード
+      候補を使って対象サービスの案件を探し、提携申請 → 承認後の報酬額/リンクコードを
+      Claude側へ共有してもらい、`asp_programs`テーブルへ実測反映する
 - [ ] CTAクリック計測の実装方式決定（はてなブログ/ライブドアブログでの外部タグ設置可否の実地確認）
 - [ ] Google Search Console / GA4 プロパティ設計（ブログ単位でのGSC登録可否を確認、
       はてな・ライブドア両方で並行計測できるようにする）

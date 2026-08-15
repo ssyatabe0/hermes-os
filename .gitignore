@@ -216,3 +216,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Hermes OS automation/ (browser automation) ---
+# 認証情報・セッション・スクリーンショット・ログは機密/個人情報を含みうるため
+# 絶対に公開リポジトリへコミットしない。
+automation/.env
+automation/profiles/
+automation/logs/
+automation/screenshots/
+automation/data/

@@ -92,20 +92,45 @@ CREATE TABLE license_requirements (
     confidence                    TEXT CHECK (confidence IN ('high','medium','low'))
 );
 
+-- ASP案件ログ（追記専用。同じ案件を再チェックするたびに新規行=last_checked_atで最新を判定）
 CREATE TABLE asp_programs (
     asp_program_id     INTEGER PRIMARY KEY,
     service_id          INTEGER REFERENCES service_catalog(service_id),
-    asp_name             TEXT NOT NULL,   -- 例: A8.net, もしもアフィリエイト, afb
-    program_name          TEXT,
-    commission_type        TEXT,  -- 成果報酬/固定/クリック課金 等
-    commission_amount       TEXT,
-    approval_conditions      TEXT,
-    cookie_duration_days       INTEGER,
-    data_type                  TEXT NOT NULL DEFAULT 'estimate' CHECK (data_type IN ('actual','estimate','not_available')),
-    notes                        TEXT,
-    source_url                    TEXT,
-    collected_at                   TEXT
+    asp_name             TEXT NOT NULL,   -- 例: A8.net, バリューコマース, もしもアフィリエイト, アクセストレード, afb
+    program_id             TEXT,   -- ASP側の案件ID(取得できる場合)
+    advertiser               TEXT,   -- 広告主名
+    program_name              TEXT,   -- 案件名
+    category                    TEXT,
+    program_url                   TEXT,
+    commission_type                 TEXT,  -- 成果報酬/固定/クリック課金 等
+    commission_amount                 TEXT,
+    recurring_commission                TEXT,  -- 月額継続報酬の有無・金額
+    conversion_condition                  TEXT,  -- 成果地点の条件
+    approval_conditions                     TEXT,
+    cookie_duration_days                      INTEGER,
+    partnership_status                          TEXT CHECK (partnership_status IN
+                                                 ('not_applied','pending_review','approved','rejected','ended','unknown')),
+    status                                        TEXT DEFAULT 'active' CHECK (status IN ('active','ended','unknown')),
+    data_type                                       TEXT NOT NULL DEFAULT 'estimate'
+                                                     CHECK (data_type IN ('actual','estimate','not_available')),
+    notes                                             TEXT,
+    source_url                                          TEXT,
+    last_checked_at                                       TEXT,
+    collected_at                                            TEXT
 );
+
+CREATE INDEX idx_asp_programs_lookup ON asp_programs(asp_name, service_id, collected_at);
+
+CREATE VIEW v_asp_programs_latest AS
+SELECT a.*
+FROM asp_programs a
+JOIN (
+    SELECT asp_name, IFNULL(program_id,program_name) AS pid, MAX(collected_at) AS max_collected_at
+    FROM asp_programs
+    GROUP BY asp_name, IFNULL(program_id,program_name)
+) latest
+ON a.asp_name = latest.asp_name AND IFNULL(a.program_id,a.program_name) = latest.pid
+   AND a.collected_at = latest.max_collected_at;
 
 -- =========================================================
 -- 3. キーワードDB（追記専用ログ）

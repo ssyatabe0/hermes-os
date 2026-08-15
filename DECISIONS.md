@@ -115,6 +115,50 @@
   12ヶ月という制約に対してリスクが高いため、需要検証とパートナー探索の並走モデルに変更
 - 日付: 2026-08-15
 
+## D-010: ブラウザ自動化基盤(`automation/`)を追加。Playwright + 専用プロファイル方式を採用
+
+- 決定: 汎用ブラウザ自動化モジュール(`automation/browser/engine.py`)をPlaywright(Python)で
+  実装。ASP・ライブドアブログ等への対応は「専用Chromeプロファイル＋人間が最初の1回だけ
+  手動ログイン」方式（ユーザー提案の第1候補）を採用。CDPで既存Chromeへ接続する方式や
+  既存プロファイルのコピーを使う方式（第2・第3候補）は、本番Chromeプロファイルを壊す
+  リスクがあるため見送り
+- **重要な環境上の発見**: このClaude Codeクラウドセッションは、ユーザーのMac上ではなく
+  独立したコンテナで動いている。実際に検証した結果、このコンテナのネットワークポリシーは
+  `livedoor.com`・`a8.net`・`google.com`等、一般の外部サイトへのHTTPS接続を
+  プロキシ側で403(policy denial)として拒否することを確認した
+  （`curl -x $HTTPS_PROXY --cacert /root/.ccr/ca-bundle.crt https://example.com` で再現、
+  `/root/.ccr/README.md`记載の「組織ポリシー拒否はリトライしない」方針に従いこれ以上の
+  回避は試みていない）。npm/PyPI/GitHub/Anthropic等の許可リストに載ったホストのみ到達可能。
+  したがって、Playwright自体は正常に動作する（ローカルの静的テストページに対する起動・
+  遷移・クリック・入力・検索・テーブル抽出・リンク抽出・スクリーンショットまで実機検証済み、
+  `automation/scripts/smoke_test_local.py`）が、**livedoor/A8.net/バリューコマース等の
+  実サイトへは、このクラウドセッションからは技術的に到達できない**
+- 結論: 実サイトへの自動アクセスが必要な作業は、ユーザーのローカルMacでClaude Code CLIを
+  起動するか、人間が直接 `automation/` のスクリプトを実行する運用とする
+  （`automation/README.md`に手順を記載）
+- 理由: 「できません」で終了せず技術的に検証すること、というユーザー指示に従い、
+  Playwright導入・ローカル動作確認・ネットワーク到達性の実地検証まで実施した上での結論
+- 日付: 2026-08-15
+
+## D-011: ASP自動操作は「規約確認済みのASPのみ、read-onlyに限定」で実装
+
+- 決定: `automation/asp/base.py` に `TOS_REGISTRY` を設け、ASPごとに
+  `automation_allowed`("unknown"/"prohibited"/"allowed_readonly") と
+  `application_allowed`(既定False固定)を管理する。現時点でA8.net・バリューコマース・
+  もしもアフィリエイト・アクセストレード・afbはすべて`"unknown"`とし、
+  **どのASPに対しても自動情報取得・自動提携申請を実行しない**設定にした
+- 理由: WebSearchでA8.net・バリューコマースの禁止事項ページを確認したが、自動アクセス/
+  スクレイピング/botに関する明示条項を特定できなかった（`unknown`のまま）。ユーザー指示
+  「規約上不明・禁止の場合は自動実行しない」を機械的に担保するため、コード側で
+  `require_readonly_allowed()`が例外を送出するガードを実装し、実際に動作確認済み
+- 代替案: 「明示的に禁止と書かれていなければ許可されているとみなす」という解釈で
+  自動化を進める → 却下。規約不明を自動化OKの理由にはしない
+- 提携申請(`application_allowed`)は将来規約が確認できたASPでも常にFalse固定とし、
+  常に人間が最終確認して手動申請する（契約行為を自動確定させない、というユーザー指示に
+  対応）。書き込み系操作全般は`BrowserSession(allow_write=False)`が既定で、
+  `submit_write()`を呼んでも例外になることをテストで確認済み
+- 日付: 2026-08-15
+
 ## D-007: 許認可未調査のサービスは「自社化不可」をデフォルトとする
 
 - 決定: `service_catalog.requires_license` が未調査のサービスも、自社受付の

@@ -78,10 +78,21 @@ DB設計は全国展開を前提に汎用化するが、**記事生成・SEO・�
   04_affluent_ltv.md             富裕層LTV最大化候補TOP5
   05_annual_contract.md          年間契約・月額契約候補TOP5
   06_btob_candidates.md          BtoB継続受注候補TOP5
+/automation/            ブラウザ自動化基盤（Playwright）。詳細は automation/README.md
+  browser/engine.py       汎用ブラウザ操作エンジン(専用プロファイル、read-only既定)
+  asp/                     A8.net等ASP案件調査モジュール(規約確認済みのみ動作)
+  livedoor/                ライブドアブログ AtomPub API連携
+  scripts/                 動作確認・CLIスクリプト
+  profiles/ logs/ screenshots/ data/  … すべて.gitignore対象(機密情報を含みうる)
 ```
 
+**重要:** `automation/`配下のコードは、Claude Codeのこのクラウドセッションからは
+外部サイト（livedoor.com, a8.net等）へネットワーク到達できないため実行できない
+（`automation/README.md`, `DECISIONS.md` D-010参照）。実サイトへの自動アクセスが
+必要な作業は、ユーザーのローカルMacでClaude Code CLIを使うか、人間が直接実行すること。
+
 将来追加予定（今回は未着手、`TODO.md` 参照）:
-`/content/`（実際の記事）, `/dashboard/`（計測ダッシュボード）, `/tracking/`（GSC/GA/ASP連携）
+`/content/`（実際の記事）, `/dashboard/`（計測ダッシュボード）
 
 ## 4. データ設計の原則（厳守）
 
