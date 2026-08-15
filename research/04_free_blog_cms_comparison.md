@@ -10,11 +10,35 @@
 | アメーバブログ（アメブロ） | 独自の「Ameba Pick」中心、外部ASPは制限的 | 不可（無料範囲） | 集客力はあるがアフィリエイト用途は独自機能に誘導されやすい | 条件あり | 低（サイバーエージェント運営） | 低〜中 |
 | note | 外部ASPは基本NG（Amazonアソシエイトは可） | 不可 | 記事単位よりnote全体のポジショニングが強く、SEOブログ用途にはやや不向き | 有料販売機能あり | 低 | 低（記事単位のSEO最適化がしにくい） |
 | WordPress（自己ホスト） | 完全に自由 | 必須（別途取得） | 完全に自由に最適化可能 | 完全に自由 | 自分の管理次第 | 最初から自社資産 |
+| ライブドアブログ | 可（禁止事項に注意） | 不明（要確認） | 老舗、集客力ありとされる | 可（Google Adsense/ASP/Amazon/楽天いずれも可） | 中（運営元LINEヤフー、実績長い） | 高（AtomPub APIで記事の一括取得・投稿が可能） |
 
 出典: [無料ブログ比較(note記事)](https://note.com/marine_drop0416/n/n3aed37f0a772),
 [無料ブログはどこがいい？(バリューノート)](https://www.value-domain.com/media/free-blog/),
 [アフィリエイトできる無料ブログ(theapps.jp)](https://theapps.jp/affiliate-navi/713/)
 data_type=estimate, confidence=medium（複数メディアの記述を総合。一次規約文書までは未確認）
+
+## 2.1 ライブドアブログ（2026-08-15追記、ユーザー指示により追加採用）
+
+調査日: 2026-08-15
+
+- **アフィリエイト**: 禁止されていない。GoogleAdsense、ASPアフィリエイト、Amazonアソシエイト、
+  楽天アフィリエイトいずれも掲載可能。一部メディアでは「他の無料ブログより規約が緩い」と
+  言われる一方、[「ライブドアブログはアフィリエイトに寛容という幻想」という反論記事](https://web-kumitate-koubou.com/livedoor-blog-affiliate-myth/)
+  もあり、**禁止事項の詳細は公式ヘルプで個別確認が必要**（confidence=medium）。
+  出典: [ブログでおこづかい(公式ヘルプ)](https://help.blogpark.jp/archives/52435409.html),
+  [ライブドアブログの収益化方法(wizblog)](https://wizblog.jp/livedoor-blog-monetization/)
+- **自動投稿(AtomPub API)**: ライブドアブログはAtomPub APIに対応しており、記事投稿・編集・
+  画像アップロードをプログラムから実行できる。**重要: 認証に使うのはログインパスワードではなく、
+  ブログ設定タブの「Atom API」欄から取得する別の「Atom Pub用パスワード（APIキー）」**。
+  Basic認証またはWSSE認証で利用する。
+  出典: [ブログ投稿APIのAtomPubに対応しました(公式スタッフブログ)](https://staff.livedoor.blog/archives/51824574.html),
+  [Blog PC版 AtomPub APIについて(公式サポート)](https://support.livedoor.info/hc/ja/articles/9615538421007--Blog-PC%E7%89%88-AtomPub-API%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6),
+  [Pythonでライブドアブログに記事を投稿(ikapblog)](https://blog.ikappio.com/python-post-or-get-article-on-livedoor-blog/)
+  data_type=actual, confidence=high
+- **運用上の注意**: ログインパスワードは自動投稿には使えない（アカウント本体のセキュリティ
+  保護のため、外部ツールにはAPIキーを渡すのが公式に推奨される設計）。本プロジェクトでは
+  ログインパスワードをそのまま自動化に使うことはせず、AtomPub用APIキーの提供を待って
+  投稿スクリプトを実装する方針（`DECISIONS.md` D-008参照）。
 
 ## 2. 選定
 
