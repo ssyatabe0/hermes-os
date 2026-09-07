@@ -1,0 +1,36 @@
+name: Generate case thumbnails
+
+on:
+  push:
+    branches: [claude/admiring-euler-sz8ofo]
+    paths:
+      - "tools/generate_case_thumbnails.py"
+      - ".github/workflows/generate-thumbnails.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install Pillow
+      - run: python tools/generate_case_thumbnails.py
+      - name: Commit regenerated banners
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/case-thumbnails
+          if git diff --cached --quiet; then
+            echo "No banner changes."
+          else
+            git commit -m "Regenerate case thumbnail banners" \
+              -m "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>" \
+              -m "Claude-Session: https://claude.ai/code/session_01NvzCWk8RSDmu2btj4moZxF"
+            git push
+          fi
